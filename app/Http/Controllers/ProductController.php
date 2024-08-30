@@ -37,7 +37,13 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        return Product::with('category')->findOrFail($id);
+        $product = Product::with('category')->find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found.'], 422);
+        }
+    
+        return $product;
     }
 
     /**
@@ -70,7 +76,11 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found.'], 422);
+        }
 
         $request->validate([
             'title' => 'sometimes|string|max:255',
@@ -93,9 +103,14 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-        $product->delete();
+        $product = Product::find($id);
 
+        if (!$product) {
+            return response()->json(['error' => 'Product not found.'], 422);
+        }
+    
+        $product->delete();
+    
         return response()->json(null, 204);
     }
 }
